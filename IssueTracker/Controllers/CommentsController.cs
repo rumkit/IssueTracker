@@ -24,19 +24,17 @@ namespace IssueTracker.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(int issueId, string text)
+        public async Task<IActionResult> Create(int issueId, [Bind("Text")]Comment comment)
         {
-            var comment = new Comment()
-            {
-                Text = text,
-                DateCreated = DateTime.Now,
-                Issue = await _issuesRepository.GetIssueAsync(issueId)
-            };            
-            if(comment.Issue != null && !string.IsNullOrWhiteSpace(comment.Text))
-            {
+            comment.Issue = await _issuesRepository.GetIssueAsync(issueId);
+            if (comment.Issue != null)
+                ModelState.Remove(nameof(comment.Issue));
+            if (ModelState.IsValid)
+            {                
+                comment.DateCreated = DateTime.Now;
                 await _issuesRepository.AddCommentAsync(comment);
             }            
-            return RedirectToAction("Details", "Issues", new { id = issueId });
+            return RedirectToAction("Details", "Issues", new { id = issueId });            
         }        
     }
 }

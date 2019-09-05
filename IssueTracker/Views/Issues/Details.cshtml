@@ -35,17 +35,7 @@
     <a asp-action="Index">Back to List</a>
     <hr />
     <h5>Comments</h5>
-    <form asp-controller="Comments" asp-action="Create">
-        @{
-            int issueId = -1;
-            string text = null;
-        }
-        <div class="form-group">
-            <input type="text" class="form-control" asp-for="@text" placeholder="Enter comment text...">
-        </div>
-        <input type="hidden" asp-for="@issueId" value="@Model.Id" />
-        <button class="btn btn-outline-primary" type="submit">Add comment</button>
-    </form>
+    @await Html.PartialAsync("/Views/Comments/_CreatePartial.cshtml", new Comment() { Issue = Model })
     <br />
     @foreach (var comment in Model.Comments.OrderByDescending(c => c.DateCreated))
     {

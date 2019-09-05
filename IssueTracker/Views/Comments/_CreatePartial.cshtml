@@ -1,0 +1,12 @@
+﻿@model Comment
+
+<form asp-controller="Comments" asp-action="Create">
+    @{ 
+        var issueId = Model.Issue.Id;
+    }
+    <div class="form-group">
+        <input type="text" class="form-control" asp-for="Text" placeholder="Enter comment text...">
+    </div>
+    <input type="hidden" asp-for="@issueId"/>
+    <button class="btn btn-outline-primary" type="submit">Add comment</button>
+</form>
