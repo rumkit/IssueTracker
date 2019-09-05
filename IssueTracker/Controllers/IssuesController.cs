@@ -12,29 +12,23 @@ namespace IssueTracker.Controllers
 {
     public class IssuesController : Controller
     {
-        private readonly IssueTrackerDbContext _context;
+        IIssuesRepository _issuesRepository;
 
-        public IssuesController(IssueTrackerDbContext context)
+        public IssuesController(IIssuesRepository issuesRepository)
         {
-            _context = context;
+            _issuesRepository = issuesRepository;
         }
 
         // GET: Issues
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Issues.ToListAsync());
+            return View(await _issuesRepository.GetIssuesAsync());
         }
 
         // GET: Issues/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var issue = await _context.Issues
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var issue = await _issuesRepository.GetIssueAsync(id);
             if (issue == null)
             {
                 return NotFound();
@@ -59,22 +53,16 @@ namespace IssueTracker.Controllers
             if (ModelState.IsValid)
             {
                 issue.DateCreated = DateTime.Now;
-                _context.Add(issue);
-                await _context.SaveChangesAsync();
+                await _issuesRepository.CreateIssueAsync(issue);
                 return RedirectToAction(nameof(Index));
             }
             return View(issue);
         }
 
         // GET: Issues/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var issue = await _context.Issues.FindAsync(id);
+            var issue = await _issuesRepository.GetIssueAsync(id);
             if (issue == null)
             {
                 return NotFound();
@@ -98,8 +86,7 @@ namespace IssueTracker.Controllers
             {
                 try
                 {
-                    _context.Update(issue);
-                    await _context.SaveChangesAsync();
+                    await _issuesRepository.UpdateIssueAsync(issue);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -118,15 +105,9 @@ namespace IssueTracker.Controllers
         }
 
         // GET: Issues/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var issue = await _context.Issues
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var issue = await _issuesRepository.GetIssueAsync(id);
             if (issue == null)
             {
                 return NotFound();
@@ -140,15 +121,14 @@ namespace IssueTracker.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var issue = await _context.Issues.FindAsync(id);
-            _context.Issues.Remove(issue);
-            await _context.SaveChangesAsync();
+            var issue = await _issuesRepository.GetIssueAsync(id);
+            await _issuesRepository.RemoveIssueAsync(issue);
             return RedirectToAction(nameof(Index));
         }
 
         private bool IssueExists(int id)
         {
-            return _context.Issues.Any(e => e.Id == id);
+            return _issuesRepository.GetIssueAsync(id).Result != null;
         }
     }
 }
