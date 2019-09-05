@@ -8,12 +8,13 @@ namespace IssueTracker.Models
 {
     public class Issue
     {
+        [Key]
         public int Id { get; set; }
         [Required]
         public string Theme { get; set; }
         public string Description { get; set; }
         public DateTime DateCreated { get; set; }
 
-        public Comment[] Comments {get;set;}
+        public virtual List<Comment> Comments {get;set;}
     }
 }

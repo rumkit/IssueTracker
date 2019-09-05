@@ -14,6 +14,11 @@ namespace IssueTracker.Data
 
         }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseLazyLoadingProxies();
+        }
+
         public DbSet<Issue> Issues { get; set; }
         public DbSet<Comment> Comments { get; set; }
     }

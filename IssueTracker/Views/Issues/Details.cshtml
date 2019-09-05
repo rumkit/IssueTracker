@@ -10,22 +10,22 @@
     <h4>Issue</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Theme)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Theme)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Description)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Description)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.DateCreated)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.DateCreated)
         </dd>
     </dl>
@@ -33,4 +33,27 @@
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
+    <hr />
+    <h5>Comments</h5>
+    <form asp-controller="Comments" asp-action="Create">
+        @{
+            int issueId = -1;
+            string text = null;
+        }
+        <div class="form-group">
+            <input type="text" class="form-control" asp-for="@text" placeholder="Enter comment text...">
+        </div>
+        <input type="hidden" asp-for="@issueId" value="@Model.Id" />
+        <button class="btn btn-outline-primary" type="submit">Add comment</button>
+    </form>
+    <br />
+    @foreach (var comment in Model.Comments.OrderByDescending(c => c.DateCreated))
+    {
+        <div class="badge badge-info">@comment.DateCreated.ToString("dd.MM.yyyy hh:mm:ss")</div>
+        <div class="card">
+            <div class="card-body">
+                @comment.Text
+            </div>
+        </div>
+    }
 </div>

@@ -27,9 +27,10 @@ namespace IssueTracker.Migrations
 
                     b.Property<DateTime>("DateCreated");
 
-                    b.Property<int?>("IssueId");
+                    b.Property<int>("IssueId");
 
-                    b.Property<string>("Text");
+                    b.Property<string>("Text")
+                        .IsRequired();
 
                     b.HasKey("Id");
 
@@ -48,7 +49,8 @@ namespace IssueTracker.Migrations
 
                     b.Property<string>("Description");
 
-                    b.Property<string>("Theme");
+                    b.Property<string>("Theme")
+                        .IsRequired();
 
                     b.HasKey("Id");
 
@@ -57,9 +59,10 @@ namespace IssueTracker.Migrations
 
             modelBuilder.Entity("IssueTracker.Models.Comment", b =>
                 {
-                    b.HasOne("IssueTracker.Models.Issue")
+                    b.HasOne("IssueTracker.Models.Issue", "Issue")
                         .WithMany("Comments")
-                        .HasForeignKey("IssueId");
+                        .HasForeignKey("IssueId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }
