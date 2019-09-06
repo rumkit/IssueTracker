@@ -19,6 +19,19 @@ namespace IssueTracker.Data
             optionsBuilder.UseLazyLoadingProxies();
         }
 
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<Issue>()
+            .Property(i => i.DateCreated)
+            .HasDefaultValueSql("getdate()");
+            builder.Entity<Comment>()
+            .Property(c => c.DateCreated)
+            .HasDefaultValueSql("getdate()");
+            builder.Entity<Issue>()
+            .Property(i => i.Status)
+            .HasDefaultValue(IssueStatus.Open);
+        }
+
         public DbSet<Issue> Issues { get; set; }
         public DbSet<Comment> Comments { get; set; }
     }

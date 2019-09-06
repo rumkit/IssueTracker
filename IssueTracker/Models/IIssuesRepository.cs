@@ -13,6 +13,7 @@ namespace IssueTracker.Models
         Task<int> RemoveIssueAsync(Issue issue);
         Task<int> UpdateIssueAsync(Issue issue);
         Task<int> AddCommentAsync(Comment comment);
+        string GetIssueChangesSummary(Issue issue);
         
     }
 }

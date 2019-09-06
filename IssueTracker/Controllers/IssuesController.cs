@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using IssueTracker.Data;
 using IssueTracker.Models;
+using System.Text;
 
 namespace IssueTracker.Controllers
 {
@@ -75,18 +76,34 @@ namespace IssueTracker.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Theme,Description,DateCreated")] Issue issue)
+        public async Task<IActionResult> Edit(int id, string comment, [Bind("Id,Theme,Description,DateCreated,Status")] Issue issue)
         {
             if (id != issue.Id)
             {
                 return NotFound();
             }
 
+            if (string.IsNullOrWhiteSpace(comment))
+            {
+                return BadRequest();
+            }
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    await _issuesRepository.UpdateIssueAsync(issue);
+                    var targetIssue = await _issuesRepository.GetIssueAsync(id);
+                    targetIssue.Status = issue.Status;
+                    targetIssue.Description = issue.Description;
+                    targetIssue.Theme = issue.Theme;
+
+                    var changeCommnent = new Comment()
+                    {
+                        Text = _issuesRepository.GetIssueChangesSummary(targetIssue) + comment,
+                        Issue = targetIssue
+                    };                    
+                    await _issuesRepository.AddCommentAsync(changeCommnent);
+                    await _issuesRepository.UpdateIssueAsync(targetIssue);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -99,10 +116,12 @@ namespace IssueTracker.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details),new { id = issue.Id});
             }
             return View(issue);
         }
+
+        
 
         // GET: Issues/Delete/5
         public async Task<IActionResult> Delete(int id)
