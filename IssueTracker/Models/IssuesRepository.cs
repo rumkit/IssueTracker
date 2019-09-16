@@ -37,19 +37,21 @@ namespace IssueTracker.Models
             return await _context.Issues.ToListAsync();
         }
 
-        public string GetIssueChangesSummary(Issue issue)
+        public async Task<string[]> GetIssueChangesSummary(Issue issue)
         {
-            var sb = new StringBuilder();           
-            foreach (var p in _context.Entry(issue).Properties)
-            {
-                if (p.IsModified)
-                {
-                    sb.Append($"{p.Metadata.Name} changed from {p.OriginalValue} to {p.CurrentValue}<br>");
-                }
-            }
-            sb.Append("<br>");
-            return sb.ToString();
-                
+            var originalIssue = await _context.Issues.AsNoTracking().FirstAsync(i => i.Id == issue.Id);            
+            var changeList = new List<string>();
+
+            if(originalIssue.Theme != issue.Theme)
+                changeList.Add($"Theme changed from {originalIssue.Theme} to {issue.Theme}");
+
+            if (originalIssue.Description != issue.Description)
+                changeList.Add($"Description changed from {originalIssue.Description} to {issue.Description}");
+
+            if (originalIssue.Status != issue.Status)
+                changeList.Add($"Status changed from {originalIssue.Status} to {issue.Status}");
+            
+            return changeList.ToArray();                            
         }
 
         public async Task<int> RemoveIssueAsync(Issue issue)

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using IssueTracker.Data;
 using IssueTracker.Models;
 using System.Text;
+using IssueTracker.Helpers;
 
 namespace IssueTracker.Controllers
 {
@@ -92,18 +93,15 @@ namespace IssueTracker.Controllers
             {
                 try
                 {
-                    var targetIssue = await _issuesRepository.GetIssueAsync(id);
-                    targetIssue.Status = issue.Status;
-                    targetIssue.Description = issue.Description;
-                    targetIssue.Theme = issue.Theme;
+                   
 
                     var changeCommnent = new Comment()
                     {
-                        Text = _issuesRepository.GetIssueChangesSummary(targetIssue) + comment,
-                        Issue = targetIssue
-                    };                    
+                        Text = HtmlFormatterHelper.MakeChangeList(await _issuesRepository.GetIssueChangesSummary(issue)) + comment,
+                        Issue = issue
+                    };                                        
+                    await _issuesRepository.UpdateIssueAsync(issue);
                     await _issuesRepository.AddCommentAsync(changeCommnent);
-                    await _issuesRepository.UpdateIssueAsync(targetIssue);
                 }
                 catch (DbUpdateConcurrencyException)
                 {

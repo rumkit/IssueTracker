@@ -18,5 +18,12 @@ namespace IssueTracker.Models
         public DateTime DateCreated { get; set; }
 
         public virtual List<Comment> Comments {get;set;}
+
+        internal void CopyFrom(Issue issue)
+        {
+            this.Theme = issue.Theme;
+            this.Description = issue.Description;
+            this.Status = issue.Status;
+        }
     }
 }
